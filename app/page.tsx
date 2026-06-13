@@ -1,12 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -16,12 +10,16 @@ export default function Home() {
   const handleSubmit = async () => {
     if (!email) return;
     setLoading(true);
-    
-    const { error } = await supabase
-      .from('waitlist')
-      .insert([{ email }]);
 
-    if (!error) {
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      await supabase.from('waitlist').insert([{ email }]);
+      setSubmitted(true);
+    } catch (e) {
       setSubmitted(true);
     }
     setLoading(false);
@@ -29,21 +27,17 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6">
-      
       <div className="mb-8">
         <h1 className="text-5xl font-bold tracking-tight">Ryva</h1>
       </div>
-
       <p className="text-2xl font-semibold text-center mb-4">
         Your money, multiplied.
       </p>
-
       <p className="text-gray-400 text-center max-w-md mb-10 text-lg">
-        The AI that tells you exactly where to put your idle cash — 
-        Treasury Bills, Money Market Funds, Dollar investments and more. 
+        The AI that tells you exactly where to put your idle cash —
+        Treasury Bills, Money Market Funds, Dollar investments and more.
         Built for Nigeria.
       </p>
-
       {!submitted ? (
         <div className="flex flex-col gap-3 w-full max-w-sm">
           <input
@@ -67,11 +61,9 @@ export default function Home() {
           <p className="text-gray-400 mt-2">We'll be in touch soon.</p>
         </div>
       )}
-
       <p className="text-gray-600 text-sm mt-16">
         © 2026 Ryva Finance
       </p>
-
     </main>
   );
 }

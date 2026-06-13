@@ -1,38 +1,49 @@
 'use client';
 
 import { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function Home() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
-    if (email) setSubmitted(true);
+  const handleSubmit = async () => {
+    if (!email) return;
+    setLoading(true);
+    
+    const { error } = await supabase
+      .from('waitlist')
+      .insert([{ email }]);
+
+    if (!error) {
+      setSubmitted(true);
+    }
+    setLoading(false);
   };
 
   return (
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6">
       
-      {/* Logo */}
       <div className="mb-8">
-        <h1 className="text-5xl font-bold tracking-tight">
-          Ryva
-        </h1>
+        <h1 className="text-5xl font-bold tracking-tight">Ryva</h1>
       </div>
 
-      {/* Tagline */}
       <p className="text-2xl font-semibold text-center mb-4">
         Your money, multiplied.
       </p>
 
-      {/* Subtext */}
       <p className="text-gray-400 text-center max-w-md mb-10 text-lg">
         The AI that tells you exactly where to put your idle cash — 
         Treasury Bills, Money Market Funds, Dollar investments and more. 
         Built for Nigeria.
       </p>
 
-      {/* Waitlist Form */}
       {!submitted ? (
         <div className="flex flex-col gap-3 w-full max-w-sm">
           <input
@@ -44,9 +55,10 @@ export default function Home() {
           />
           <button
             onClick={handleSubmit}
+            disabled={loading}
             className="w-full bg-white text-black font-semibold py-3 rounded-xl hover:bg-gray-200 transition"
           >
-            Join the waitlist
+            {loading ? 'Joining...' : 'Join the waitlist'}
           </button>
         </div>
       ) : (
@@ -56,7 +68,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Footer */}
       <p className="text-gray-600 text-sm mt-16">
         © 2026 Ryva Finance
       </p>

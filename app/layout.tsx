@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Ryva — Your money, multiplied.",
-description: "The AI that tells you exactly where to invest your idle cash. Built for Nigeria.",
+  description: "The AI that tells you exactly where to invest your idle cash. Built for Nigeria.",
+};
 
 export default function RootLayout({
   children,
@@ -22,11 +23,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+        {children}
+      </body>
     </html>
   );
 }
